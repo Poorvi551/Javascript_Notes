@@ -1,4 +1,4 @@
-# Javascript_PentagonSpace
+# Javascript_Notes-Interview_Prep
 
 ### * History of Javscript :
 
