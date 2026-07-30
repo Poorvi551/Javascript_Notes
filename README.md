@@ -1030,8 +1030,8 @@ Inputs :
 
 * Tree structure
    
-  document
-    |____html
+      document
+         |____html
            |____head
            |       |____meta
            |       |____title
