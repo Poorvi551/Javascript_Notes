@@ -1288,6 +1288,390 @@ Inputs :
 * **Asynchronous:-**
 
 * Executes based on the events no line by line execution.
-     
+
+## * this Keyword:
+
+- `this` refers to the object that is currently executing the code.
+- Value of `this` depends on how the function is called (not where it is defined).
+
+1. Global context :
+
+  - Ex:
+```
+console.log(this); // window object (in browser)
+```
+
+2. Inside normal function :
+
+  - `this` refers to window object (in non-strict mode) or undefined (strict mode).
+  - Ex:
+```
+function show(){
+  console.log(this);
+}
+show(); // window
+```
+
+3. Inside object method :
+
+  - `this` refers to the object which called the method.
+  - Ex:
+```
+let user={
+  name:"Poorvi",
+  greet(){
+    console.log(this.name);
+  }
+}
+user.greet(); // Poorvi
+```
+
+4. Inside Arrow function :
+
+  - Arrow function does not have its own `this`.
+  - It takes `this` from its lexical (surrounding) scope.
+  - Ex:
+```
+let user={
+  name:"Poorvi",
+  greet:()=>{
+    console.log(this.name); // undefined, this = window/outer scope
+  }
+}
+user.greet();
+```
+
+- ***NOTE : This is a very common interview trap question - normal function vs arrow function behaviour of `this`.***
+
+---
+
+## * Closures (in depth):
+
+[#closures-in-depth]
+
+- A Closure is formed when a function remembers and continues to access variables from its outer(lexical) scope even after the outer function has finished executing.
+- Closures are formed every time a function is created.
+
+- Ex: Counter using Closure
+
+```
+function counter(){
+  let count=0;
+  return function(){
+    count++;
+    console.log(count);
+  }
+}
+let increment=counter();
+increment(); //1
+increment(); //2
+increment(); //3
+```
+
+- Why Closures are used :
+
+  1. Data hiding/Data privacy (private variables)
+  2. Function currying
+  3. Memoization
+  4. setTimeout with loop (to preserve variable value)
+
+- Ex: Data privacy using closure
+```
+function bankAccount(){
+  let balance=1000;   // cannot be accessed directly from outside
+  return {
+    deposit(amount){
+      balance+=amount;
+      console.log(balance);
+    },
+    withdraw(amount){
+      balance-=amount;
+      console.log(balance);
+    }
+  }
+}
+let account=bankAccount();
+account.deposit(500);  //1500
+account.withdraw(200); //1300
+```
+
+---
+
+## * call(), apply() and bind():
+
+[#call-apply-bind]
+
+- These 3 methods are used to manually set the value of `this` inside a function.
+
+1. **call()** :
+
+  - Invokes the function immediately, arguments passed one by one(comma separated).
+  - Ex:
+```
+function greet(city){
+  console.log(this.name+" from "+city);
+}
+let user={name:"Poorvi"};
+greet.call(user,"Bengaluru");
+```
+
+2. **apply()** :
+
+  - Invokes the function immediately, arguments passed as an array.
+  - Ex:
+```
+greet.apply(user,["Bengaluru"]);
+```
+
+3. **bind()** :
+
+  - Does not invoke immediately, returns a new function which we can call later.
+  - Ex:
+```
+let newFunc=greet.bind(user,"Bengaluru");
+newFunc(); // called later
+```
+
+- ***NOTE : call/apply invoke immediately, bind returns a copy of function for later use.***
+
+---
+
+## * Event Loop, Call Stack & Web APIs:
+
+[#event-loop]
+
+- Javascript is single threaded - it can execute only one task at a time.
+- To handle asynchronous tasks(setTimeout, API calls, events) javascript uses Event Loop.
+
+- Components :
+
+  1. **Call Stack** - Where javascript executes code line by line(synchronous code).
+  2. **Web APIs** - Browser provided features(setTimeout, DOM events, fetch) that run outside the call stack.
+  3. **Callback Queue(Task Queue)** - Stores callback functions(setTimeout, DOM events) waiting to enter call stack.
+  4. **Microtask Queue** - Stores promise callbacks(.then, .catch, async/await). Has higher priority than callback queue.
+  5. **Event Loop** - Continuously checks if call stack is empty, if empty it pushes tasks from microtask queue first, then callback queue.
+
+- Ex:
+```
+console.log("1");
+
+setTimeout(()=>{
+  console.log("2");
+},0);
+
+Promise.resolve().then(()=>{
+  console.log("3");
+});
+
+console.log("4");
+
+// Output : 1 4 3 2
+```
+
+- ***NOTE : Even with 0ms delay, setTimeout goes to callback queue and executes after all synchronous code and microtasks(promises) are done.***
+
+---
+
+## * Prototype & Prototypal Inheritance:
+
+[#prototype]
+
+- Every javascript object has a hidden internal property called `[[Prototype]]`, accessible via `__proto__`.
+- When we try to access a property/method not present in the object, javascript searches for it in the prototype chain.
+
+- Ex:
+```
+let animal={
+  eats:true
+}
+let dog={
+  barks:true
+}
+dog.__proto__=animal;
+console.log(dog.eats); // true (inherited from animal)
+```
+
+- **Object.create()** - creates a new object with given object as its prototype.
+
+```
+let animal={
+  eats:true
+}
+let dog=Object.create(animal);
+dog.barks=true;
+console.log(dog.eats); //true
+```
+
+- Function's prototype :
+
+```
+function Person(name){
+  this.name=name;
+}
+Person.prototype.sayHello=function(){
+  console.log("Hello "+this.name);
+}
+let p1=new Person("Poorvi");
+p1.sayHello(); // Hello Poorvi
+```
+
+---
+
+## * Async/Await:
+
+[#async-await]
+
+- Async/Await is a modern way to write asynchronous code that looks synchronous(easier than .then chaining).
+- `async` keyword before a function makes it return a promise.
+- `await` keyword pauses the execution until the promise is resolved/rejected.
+
+- Ex:
+```
+async function getData(){
+  let response = await fetch("https://dummyjson.com/products");
+  let data = await response.json();
+  console.log(data);
+}
+getData();
+```
+
+- Error handling in async/await :
+
+```
+async function getData(){
+  try{
+    let response = await fetch("https://dummyjson.com/products");
+    let data = await response.json();
+    console.log(data);
+  }catch(err){
+    console.log("Something went wrong",err);
+  }
+}
+getData();
+```
+
+- ***NOTE : await can only be used inside an async function.***
+
+---
+
+## * == vs === (Equality & Type Coercion):
+
+[#equality]
+
+- `==` (loose equality) - compares values only, converts type if different(type coercion).
+- `===` (strict equality) - compares both value and type, no conversion.
+
+- Ex:
+```
+console.log(5=="5");   // true (type converted)
+console.log(5==="5");  // false (different type)
+console.log(null==undefined); // true
+console.log(null===undefined); // false
+```
+
+- ***NOTE : Always prefer === in real projects to avoid unexpected bugs.***
+
+---
+
+## * Debouncing & Throttling:
+
+[#debounce-throttle]
+
+- Both are used to control how many times a function executes for repeated events(scroll, resize, search input, etc).
+
+1. **Debouncing** :
+
+  - Executes function only after a certain delay has passed since the last call.
+  - Used in : Search bar, Auto-save.
+
+```
+function debounce(func,delay){
+  let timer;
+  return function(...args){
+    clearTimeout(timer);
+    timer=setTimeout(()=>{
+      func(...args);
+    },delay);
+  }
+}
+```
+
+2. **Throttling** :
+
+  - Executes function at most once in a given time interval, regardless of how many times event is triggered.
+  - Used in : Scroll events, Button click(prevent multiple submit).
+
+```
+function throttle(func,limit){
+  let flag=true;
+  return function(...args){
+    if(flag){
+      func(...args);
+      flag=false;
+      setTimeout(()=>{
+        flag=true;
+      },limit);
+    }
+  }
+}
+```
+
+---
+
+## * Spread & Rest Operators:
+
+[#spread-rest]
+
+- Both use the same syntax(`...`) but work opposite to each other.
+
+1. **Spread Operator** - Unpacks/expands elements from array or object.
+
+```
+let arr1=[1,2,3];
+let arr2=[...arr1,4,5];
+console.log(arr2); //1,2,3,4,5
+
+let obj1={name:"Poorvi"};
+let obj2={...obj1,age:22};
+console.log(obj2);
+```
+
+2. **Rest Operator** - Packs/collects multiple values into a single array. Used in function parameters.
+
+```
+function sum(...nums){
+  return nums.reduce((acc,val)=>acc+val,0);
+}
+console.log(sum(1,2,3,4)); //10
+```
+
+---
+
+## * Optional Chaining(?.) & Nullish Coalescing(??):
+
+[#optional-chaining]
+
+1. **Optional Chaining(?.)** - Avoids error when accessing a property of null/undefined, returns undefined instead of throwing error.
+
+```
+let user={
+  address:{
+    city:"Bengaluru"
+  }
+}
+console.log(user?.address?.city); //Bengaluru
+console.log(user?.contact?.phone); //undefined(no error)
+```
+
+2. **Nullish Coalescing(??)** - Returns right side value only if left side is null or undefined(not for other falsy values like 0, "").
+
+```
+let a=null;
+console.log(a??"Default"); //Default
+
+let b=0;
+console.log(b??"Default"); //0 (because 0 is not null/undefined)
+console.log(b||"Default"); //Default (|| treats 0 as falsy too - difference to remember)
+```
            
       
