@@ -1701,7 +1701,7 @@ console.log(tenPercentOff(1000)); //900
 
 ---
 
-## * Memoization:
+## Memoization:
 
 - Memoization is an optimization technique where we store(cache) the result of expensive function calls and return the cached result when the same input occurs again.
 - Uses Closure to store the cache.
@@ -1740,7 +1740,7 @@ console.log(square(6)); //Calculating... 36
 
 ---
 
-## * Polyfills:
+## Polyfills:
 
 - A Polyfill is a piece of code(usually a function) that implements a feature which is not natively supported, or to manually re-implement built-in methods to show understanding of how they work internally.
 - Frequently asked in coding rounds : "Write a polyfill for map/filter/reduce/bind".
