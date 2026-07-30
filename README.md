@@ -1345,9 +1345,7 @@ user.greet();
 
 ---
 
-## * Closures (in depth):
-
-[#closures-in-depth]
+## Closures (in depth):
 
 - A Closure is formed when a function remembers and continues to access variables from its outer(lexical) scope even after the outer function has finished executing.
 - Closures are formed every time a function is created.
@@ -1397,9 +1395,7 @@ account.withdraw(200); //1300
 
 ---
 
-## * call(), apply() and bind():
-
-[#call-apply-bind]
+## call(), apply() and bind():
 
 - These 3 methods are used to manually set the value of `this` inside a function.
 
@@ -1436,9 +1432,7 @@ newFunc(); // called later
 
 ---
 
-## * Event Loop, Call Stack & Web APIs:
-
-[#event-loop]
+## Event Loop, Call Stack & Web APIs:
 
 - Javascript is single threaded - it can execute only one task at a time.
 - To handle asynchronous tasks(setTimeout, API calls, events) javascript uses Event Loop.
@@ -1472,9 +1466,7 @@ console.log("4");
 
 ---
 
-## * Prototype & Prototypal Inheritance:
-
-[#prototype]
+## Prototype & Prototypal Inheritance:
 
 - Every javascript object has a hidden internal property called `[[Prototype]]`, accessible via `__proto__`.
 - When we try to access a property/method not present in the object, javascript searches for it in the prototype chain.
@@ -1517,9 +1509,7 @@ p1.sayHello(); // Hello Poorvi
 
 ---
 
-## * Async/Await:
-
-[#async-await]
+## Async/Await:
 
 - Async/Await is a modern way to write asynchronous code that looks synchronous(easier than .then chaining).
 - `async` keyword before a function makes it return a promise.
@@ -1554,9 +1544,7 @@ getData();
 
 ---
 
-## * == vs === (Equality & Type Coercion):
-
-[#equality]
+##  == vs === (Equality & Type Coercion):
 
 - `==` (loose equality) - compares values only, converts type if different(type coercion).
 - `===` (strict equality) - compares both value and type, no conversion.
@@ -1573,9 +1561,7 @@ console.log(null===undefined); // false
 
 ---
 
-## * Debouncing & Throttling:
-
-[#debounce-throttle]
+## Debouncing & Throttling:
 
 - Both are used to control how many times a function executes for repeated events(scroll, resize, search input, etc).
 
@@ -1618,9 +1604,7 @@ function throttle(func,limit){
 
 ---
 
-## * Spread & Rest Operators:
-
-[#spread-rest]
+## Spread & Rest Operators:
 
 - Both use the same syntax(`...`) but work opposite to each other.
 
@@ -1647,9 +1631,7 @@ console.log(sum(1,2,3,4)); //10
 
 ---
 
-## * Optional Chaining(?.) & Nullish Coalescing(??):
-
-[#optional-chaining]
+## Optional Chaining(?.) & Nullish Coalescing(??):
 
 1. **Optional Chaining(?.)** - Avoids error when accessing a property of null/undefined, returns undefined instead of throwing error.
 
@@ -1673,5 +1655,156 @@ let b=0;
 console.log(b??"Default"); //0 (because 0 is not null/undefined)
 console.log(b||"Default"); //Default (|| treats 0 as falsy too - difference to remember)
 ```
-           
+
+## Currying :
+
+- Currying is a technique where a function with multiple arguments is converted into a series of functions, each taking a single argument.
+- Used to create reusable, specific versions of a function.
+
+- Normal function :
+```
+function add(a,b,c){
+  return a+b+c;
+}
+console.log(add(1,2,3)); //6
+```
+
+- Curried function :
+```
+function add(a){
+  return function(b){
+    return function(c){
+      return a+b+c;
+    }
+  }
+}
+console.log(add(1)(2)(3)); //6
+```
+
+- Curried function using Arrow function :
+```
+let add=(a)=>(b)=>(c)=>a+b+c;
+console.log(add(1)(2)(3)); //6
+```
+
+- Practical use case : Reusable specific function
+```
+function discount(percent){
+  return function(price){
+    return price-(price*percent/100);
+  }
+}
+let tenPercentOff=discount(10);
+console.log(tenPercentOff(500)); //450
+console.log(tenPercentOff(1000)); //900
+```
+
+---
+
+## * Memoization:
+
+- Memoization is an optimization technique where we store(cache) the result of expensive function calls and return the cached result when the same input occurs again.
+- Uses Closure to store the cache.
+
+- Ex: Without memoization(slow for repeated calls)
+```
+function square(n){
+  console.log("Calculating...");
+  return n*n;
+}
+console.log(square(5)); //Calculating... 25
+console.log(square(5)); //Calculating... 25 (calculated again)
+```
+
+- Ex: With memoization
+```
+function memoizedSquare(){
+  let cache={};
+  return function(n){
+    if(n in cache){
+      console.log("From cache");
+      return cache[n];
+    }
+    console.log("Calculating...");
+    cache[n]=n*n;
+    return cache[n];
+  }
+}
+let square=memoizedSquare();
+console.log(square(5)); //Calculating... 25
+console.log(square(5)); //From cache 25
+console.log(square(6)); //Calculating... 36
+```
+
+- ***NOTE : Memoization is commonly used in Dynamic Programming and React(useMemo, useCallback).***
+
+---
+
+## * Polyfills:
+
+- A Polyfill is a piece of code(usually a function) that implements a feature which is not natively supported, or to manually re-implement built-in methods to show understanding of how they work internally.
+- Frequently asked in coding rounds : "Write a polyfill for map/filter/reduce/bind".
+
+1. **Polyfill for map()** :
+```
+Array.prototype.myMap=function(callback){
+  let result=[];
+  for(let i=0;i<this.length;i++){
+    result.push(callback(this[i],i,this));
+  }
+  return result;
+}
+
+let arr=[1,2,3];
+console.log(arr.myMap((x)=>x*2)); //2,4,6
+```
+
+2. **Polyfill for filter()** :
+```
+Array.prototype.myFilter=function(callback){
+  let result=[];
+  for(let i=0;i<this.length;i++){
+    if(callback(this[i],i,this)){
+      result.push(this[i]);
+    }
+  }
+  return result;
+}
+
+let arr=[1,2,3,4,5];
+console.log(arr.myFilter((x)=>x>2)); //3,4,5
+```
+
+3. **Polyfill for reduce()** :
+```
+Array.prototype.myReduce=function(callback,initialValue){
+  let acc=initialValue;
+  for(let i=0;i<this.length;i++){
+    acc=callback(acc,this[i],i,this);
+  }
+  return acc;
+}
+
+let arr=[1,2,3,4];
+console.log(arr.myReduce((acc,val)=>acc+val,0)); //10
+```
+
+4. **Polyfill for bind()** :
+```
+Function.prototype.myBind=function(context,...args){
+  let fn=this;
+  return function(...newArgs){
+    return fn.apply(context,[...args,...newArgs]);
+  }
+}
+
+function greet(city){
+  console.log(this.name+" from "+city);
+}
+let user={name:"Poorvi"};
+let boundFunc=greet.myBind(user,"Bengaluru");
+boundFunc(); //Poorvi from Bengaluru
+```
+
+- ***NOTE : While writing polyfills, always use `this` to refer to the array/function it is called on(since we attach it to prototype), and use a normal function(not arrow function) so `this` binds correctly.***
       
